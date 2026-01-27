@@ -1,0 +1,66 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="Module" />
+
+<f:section name="Content">
+    <f:if condition="{isConfigured}">
+        <f:then>
+            <div class="unsplash-browser" id="unsplash-browser">
+                <div class="unsplash-search-form">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control"
+                                       id="unsplash-query"
+                                       placeholder="Search Unsplash..."
+                                       autocomplete="off">
+                                <button class="btn btn-primary" type="button" id="unsplash-search-btn">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="unsplash-orientation">
+                                <f:for each="{orientations}" as="label" key="value">
+                                    <option value="{value}">{label}</option>
+                                </f:for>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="unsplash-color">
+                                <f:for each="{colors}" as="label" key="value">
+                                    <option value="{value}">{label}</option>
+                                </f:for>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="unsplash-results" class="unsplash-results"></div>
+
+                <div id="unsplash-pagination" class="unsplash-pagination mt-4" style="display: none;">
+                    <button class="btn btn-default" id="unsplash-load-more">
+                        Load more
+                    </button>
+                </div>
+
+                <div id="unsplash-loading" class="unsplash-loading" style="display: none;">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </f:then>
+        <f:else>
+            <f:be.infobox title="Configuration Required" state="1">
+                <p>Please set the <code>UNSPLASH_ACCESS_KEY</code> environment variable to use this module.</p>
+                <p>You can get an API key at <a href="https://unsplash.com/developers" target="_blank">unsplash.com/developers</a>.</p>
+            </f:be.infobox>
+        </f:else>
+    </f:if>
+</f:section>
+
+</html>
