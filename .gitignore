@@ -1,0 +1,21 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer
+/vendor/
+
+# TYPO3
+/var/
+
+# Playwright
+.playwright-mcp/
+
+# Claude
+.claude/
