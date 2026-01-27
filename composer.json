@@ -1,7 +1,7 @@
 {
-    "name": "vendor/t3-unsplash",
+    "name": "vendor/fal-photo-browser",
     "type": "typo3-cms-extension",
-    "description": "Unsplash image integration for TYPO3 backend",
+    "description": "Stock photo browser for TYPO3 backend - Powered by Unsplash",
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^8.2",
@@ -11,12 +11,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Vendor\\T3Unsplash\\": "Classes/"
+            "Vendor\\FalPhotoBrowser\\": "Classes/"
         }
     },
     "extra": {
         "typo3/cms": {
-            "extension-key": "t3_unsplash"
+            "extension-key": "fal_photo_browser"
         }
     }
 }

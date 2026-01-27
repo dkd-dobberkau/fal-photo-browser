@@ -1,19 +1,19 @@
 <?php
 
-use Vendor\T3Unsplash\Controller\UnsplashController;
+use Vendor\FalPhotoBrowser\Controller\PhotoBrowserController;
 
 return [
-    'unsplash_search' => [
-        'path' => '/unsplash/search',
-        'target' => UnsplashController::class . '::searchAction',
+    'falphotobrowser_search' => [
+        'path' => '/photobrowser/search',
+        'target' => PhotoBrowserController::class . '::searchAction',
     ],
-    'unsplash_import' => [
-        'path' => '/unsplash/import',
+    'falphotobrowser_import' => [
+        'path' => '/photobrowser/import',
         'methods' => ['POST'],
-        'target' => UnsplashController::class . '::importAction',
+        'target' => PhotoBrowserController::class . '::importAction',
     ],
-    'unsplash_collections' => [
-        'path' => '/unsplash/collections',
-        'target' => UnsplashController::class . '::collectionsAction',
+    'falphotobrowser_collections' => [
+        'path' => '/photobrowser/collections',
+        'target' => PhotoBrowserController::class . '::collectionsAction',
     ],
 ];

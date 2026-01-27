@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vendor\T3Unsplash\Service;
+namespace Vendor\FalPhotoBrowser\Service;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Vendor\T3Unsplash\Domain\Dto\UnsplashPhoto;
+use Vendor\FalPhotoBrowser\Domain\Dto\UnsplashPhoto;
 
 final class UnsplashApiService
 {

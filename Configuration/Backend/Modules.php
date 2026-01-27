@@ -1,19 +1,19 @@
 <?php
 
-use Vendor\T3Unsplash\Controller\UnsplashController;
+use Vendor\FalPhotoBrowser\Controller\PhotoBrowserController;
 
 return [
-    't3unsplash' => [
+    'falphotobrowser' => [
         'parent' => 'file',
         'position' => ['after' => 'file_FilelistList'],
         'access' => 'user',
         'workspaces' => 'live',
-        'iconIdentifier' => 'module-unsplash',
-        'path' => '/module/file/unsplash',
-        'labels' => 'LLL:EXT:t3_unsplash/Resources/Private/Language/locallang_mod.xlf',
+        'iconIdentifier' => 'module-falphotobrowser',
+        'path' => '/module/file/photobrowser',
+        'labels' => 'LLL:EXT:fal_photo_browser/Resources/Private/Language/locallang_mod.xlf',
         'routes' => [
             '_default' => [
-                'target' => UnsplashController::class . '::indexAction',
+                'target' => PhotoBrowserController::class . '::indexAction',
             ],
         ],
     ],

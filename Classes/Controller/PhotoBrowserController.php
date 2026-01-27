@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Vendor\T3Unsplash\Controller;
+namespace Vendor\FalPhotoBrowser\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Http\JsonResponse;
-use Vendor\T3Unsplash\Service\FileImportService;
-use Vendor\T3Unsplash\Service\UnsplashApiService;
+use Vendor\FalPhotoBrowser\Service\FileImportService;
+use Vendor\FalPhotoBrowser\Service\UnsplashApiService;
 
 #[AsController]
-final class UnsplashController
+final class PhotoBrowserController
 {
     public function __construct(
         private readonly ModuleTemplateFactory $moduleTemplateFactory,

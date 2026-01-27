@@ -1,10 +1,10 @@
-.unsplash-results {
+.photobrowser-results {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
 }
 
-.unsplash-photo-card {
+.photobrowser-photo-card {
     position: relative;
     aspect-ratio: 1;
     border-radius: 8px;
@@ -13,17 +13,17 @@
     transition: transform 0.2s;
 }
 
-.unsplash-photo-card:hover {
+.photobrowser-photo-card:hover {
     transform: scale(1.02);
 }
 
-.unsplash-photo-card img {
+.photobrowser-photo-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.unsplash-photo-overlay {
+.photobrowser-photo-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -37,11 +37,11 @@
     transition: opacity 0.2s;
 }
 
-.unsplash-photo-card:hover .unsplash-photo-overlay {
+.photobrowser-photo-card:hover .photobrowser-photo-overlay {
     opacity: 1;
 }
 
-.unsplash-photo-overlay .photographer {
+.photobrowser-photo-overlay .photographer {
     color: white;
     font-size: 12px;
     overflow: hidden;
@@ -50,13 +50,13 @@
     max-width: 60%;
 }
 
-.unsplash-loading {
+.photobrowser-loading {
     display: flex;
     justify-content: center;
     padding: 40px;
 }
 
-.unsplash-pagination {
+.photobrowser-pagination {
     display: flex;
     justify-content: center;
 }

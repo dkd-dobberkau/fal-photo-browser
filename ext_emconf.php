@@ -1,8 +1,8 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'Unsplash Integration',
-    'description' => 'Search and import Unsplash images directly in TYPO3 backend',
+    'title' => 'FAL Photo Browser',
+    'description' => 'Search and import stock photos directly in TYPO3 backend - Powered by Unsplash',
     'category' => 'be',
     'author' => '',
     'author_email' => '',

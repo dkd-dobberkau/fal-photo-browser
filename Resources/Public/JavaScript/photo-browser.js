@@ -1,4 +1,4 @@
-class UnsplashBrowser {
+class PhotoBrowser {
     constructor() {
         this.currentPage = 1;
         this.totalPages = 0;
@@ -7,14 +7,14 @@ class UnsplashBrowser {
     }
 
     init() {
-        this.queryInput = document.getElementById('unsplash-query');
-        this.searchBtn = document.getElementById('unsplash-search-btn');
-        this.orientationSelect = document.getElementById('unsplash-orientation');
-        this.colorSelect = document.getElementById('unsplash-color');
-        this.resultsContainer = document.getElementById('unsplash-results');
-        this.loadMoreBtn = document.getElementById('unsplash-load-more');
-        this.paginationContainer = document.getElementById('unsplash-pagination');
-        this.loadingIndicator = document.getElementById('unsplash-loading');
+        this.queryInput = document.getElementById('photobrowser-query');
+        this.searchBtn = document.getElementById('photobrowser-search-btn');
+        this.orientationSelect = document.getElementById('photobrowser-orientation');
+        this.colorSelect = document.getElementById('photobrowser-color');
+        this.resultsContainer = document.getElementById('photobrowser-results');
+        this.loadMoreBtn = document.getElementById('photobrowser-load-more');
+        this.paginationContainer = document.getElementById('photobrowser-pagination');
+        this.loadingIndicator = document.getElementById('photobrowser-loading');
 
         if (!this.queryInput) return;
 
@@ -61,7 +61,7 @@ class UnsplashBrowser {
         });
 
         try {
-            const response = await fetch(TYPO3.settings.ajaxUrls.unsplash_search + '&' + params);
+            const response = await fetch(TYPO3.settings.ajaxUrls.falphotobrowser_search + '&' + params);
             const data = await response.json();
 
             this.totalPages = data.totalPages;
@@ -77,7 +77,7 @@ class UnsplashBrowser {
             }
         } catch (error) {
             console.error('Search failed:', error);
-            top.TYPO3.Notification.error('Error', 'Failed to search Unsplash');
+            top.TYPO3.Notification.error('Error', 'Failed to search photos');
         } finally {
             this.loadingIndicator.style.display = 'none';
         }
@@ -86,11 +86,11 @@ class UnsplashBrowser {
     renderPhotos(photos) {
         photos.forEach(photo => {
             const card = document.createElement('div');
-            card.className = 'unsplash-photo-card';
+            card.className = 'photobrowser-photo-card';
             card.style.backgroundColor = photo.color;
             card.innerHTML = `
                 <img src="${photo.thumbUrl}" alt="${photo.altDescription}" loading="lazy">
-                <div class="unsplash-photo-overlay">
+                <div class="photobrowser-photo-overlay">
                     <span class="photographer">${photo.photographerName}</span>
                     <button class="btn btn-sm btn-primary import-btn" data-photo-id="${photo.id}">
                         Import
@@ -108,10 +108,10 @@ class UnsplashBrowser {
     }
 
     async importPhoto(photoId) {
-        top.TYPO3.Notification.info('Importing', 'Downloading image from Unsplash...');
+        top.TYPO3.Notification.info('Importing', 'Downloading image...');
 
         try {
-            const response = await fetch(TYPO3.settings.ajaxUrls.unsplash_import, {
+            const response = await fetch(TYPO3.settings.ajaxUrls.falphotobrowser_import, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,5 +138,5 @@ class UnsplashBrowser {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new UnsplashBrowser();
+    new PhotoBrowser();
 });

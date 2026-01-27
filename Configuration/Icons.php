@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'module-unsplash' => [
+    'module-falphotobrowser' => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        'source' => 'EXT:t3_unsplash/Resources/Public/Icons/module-unsplash.svg',
+        'source' => 'EXT:fal_photo_browser/Resources/Public/Icons/module-falphotobrowser.svg',
     ],
 ];

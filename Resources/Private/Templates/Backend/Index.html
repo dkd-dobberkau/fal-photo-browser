@@ -5,37 +5,37 @@
 <f:layout name="Module" />
 
 <f:section name="Before">
-    <f:asset.css identifier="unsplash-backend" href="EXT:t3_unsplash/Resources/Public/Css/backend.css" />
-    <f:asset.script identifier="unsplash-browser" src="EXT:t3_unsplash/Resources/Public/JavaScript/unsplash-browser.js" />
+    <f:asset.css identifier="falphotobrowser-backend" href="EXT:fal_photo_browser/Resources/Public/Css/backend.css" />
+    <f:asset.script identifier="falphotobrowser" src="EXT:fal_photo_browser/Resources/Public/JavaScript/photo-browser.js" />
 </f:section>
 
 <f:section name="Content">
     <f:if condition="{isConfigured}">
         <f:then>
-            <div class="unsplash-browser" id="unsplash-browser">
-                <div class="unsplash-search-form">
+            <div class="photobrowser" id="photobrowser">
+                <div class="photobrowser-search-form">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <div class="input-group">
                                 <input type="text"
                                        class="form-control"
-                                       id="unsplash-query"
-                                       placeholder="Search Unsplash..."
+                                       id="photobrowser-query"
+                                       placeholder="Search photos..."
                                        autocomplete="off">
-                                <button class="btn btn-primary" type="button" id="unsplash-search-btn">
+                                <button class="btn btn-primary" type="button" id="photobrowser-search-btn">
                                     Search
                                 </button>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-select" id="unsplash-orientation">
+                            <select class="form-select" id="photobrowser-orientation">
                                 <f:for each="{orientations}" as="label" key="value">
                                     <option value="{value}">{label}</option>
                                 </f:for>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-select" id="unsplash-color">
+                            <select class="form-select" id="photobrowser-color">
                                 <f:for each="{colors}" as="label" key="value">
                                     <option value="{value}">{label}</option>
                                 </f:for>
@@ -44,15 +44,17 @@
                     </div>
                 </div>
 
-                <div id="unsplash-results" class="unsplash-results"></div>
+                <p class="text-muted small mb-3">Powered by <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></p>
 
-                <div id="unsplash-pagination" class="unsplash-pagination mt-4" style="display: none;">
-                    <button class="btn btn-default" id="unsplash-load-more">
+                <div id="photobrowser-results" class="photobrowser-results"></div>
+
+                <div id="photobrowser-pagination" class="photobrowser-pagination mt-4" style="display: none;">
+                    <button class="btn btn-default" id="photobrowser-load-more">
                         Load more
                     </button>
                 </div>
 
-                <div id="unsplash-loading" class="unsplash-loading" style="display: none;">
+                <div id="photobrowser-loading" class="photobrowser-loading" style="display: none;">
                     <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>

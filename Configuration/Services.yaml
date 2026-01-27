@@ -4,5 +4,5 @@ services:
     autoconfigure: true
     public: false
 
-  Vendor\T3Unsplash\:
+  Vendor\FalPhotoBrowser\:
     resource: '../Classes/*'
