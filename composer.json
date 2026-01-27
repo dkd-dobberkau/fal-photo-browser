@@ -27,7 +27,7 @@
     },
     "extra": {
         "typo3/cms": {
-            "extension-key": "fal_photo_browser"
+            "extension-key": "dkd_fal_photo_browser"
         }
     }
 }

@@ -30,7 +30,7 @@ composer require dkd-dobberkau/fal-photo-browser
 ### Manual Installation
 
 1. Download the extension
-2. Place it in `packages/fal_photo_browser/`
+2. Place it in `packages/dkd_fal_photo_browser/`
 3. Add the path repository to your `composer.json`:
 
 ```json
@@ -49,7 +49,7 @@ composer require dkd-dobberkau/fal-photo-browser
 ### Activate Extension
 
 ```bash
-vendor/bin/typo3 extension:setup --extension=fal_photo_browser
+vendor/bin/typo3 extension:setup --extension=dkd_fal_photo_browser
 ```
 
 ## Configuration
@@ -106,7 +106,7 @@ Imported images are stored in `fileadmin/unsplash/YYYY/MM/` with full metadata i
 ## File Structure
 
 ```
-fal_photo_browser/
+dkd_fal_photo_browser/
 ├── Classes/
 │   ├── Controller/
 │   │   └── PhotoBrowserController.php
