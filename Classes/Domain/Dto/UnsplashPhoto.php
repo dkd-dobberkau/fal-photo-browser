@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Vendor\FalPhotoBrowser\Domain\Dto;
+namespace DkdDobberkau\FalPhotoBrowser\Domain\Dto;
 
 final class UnsplashPhoto
 {

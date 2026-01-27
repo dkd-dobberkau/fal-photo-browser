@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vendor\FalPhotoBrowser\Service;
+namespace DkdDobberkau\FalPhotoBrowser\Service;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Vendor\FalPhotoBrowser\Domain\Dto\UnsplashPhoto;
+use DkdDobberkau\FalPhotoBrowser\Domain\Dto\UnsplashPhoto;
 
 final class UnsplashApiService
 {

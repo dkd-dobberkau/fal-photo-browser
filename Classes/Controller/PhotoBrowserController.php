@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Vendor\FalPhotoBrowser\Controller;
+namespace DkdDobberkau\FalPhotoBrowser\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Http\JsonResponse;
-use Vendor\FalPhotoBrowser\Service\FileImportService;
-use Vendor\FalPhotoBrowser\Service\UnsplashApiService;
+use DkdDobberkau\FalPhotoBrowser\Service\FileImportService;
+use DkdDobberkau\FalPhotoBrowser\Service\UnsplashApiService;
 
 #[AsController]
 final class PhotoBrowserController

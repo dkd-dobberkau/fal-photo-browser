@@ -1,6 +1,6 @@
 <?php
 
-use Vendor\FalPhotoBrowser\Controller\PhotoBrowserController;
+use DkdDobberkau\FalPhotoBrowser\Controller\PhotoBrowserController;
 
 return [
     'falphotobrowser_search' => [

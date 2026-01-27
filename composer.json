@@ -1,8 +1,19 @@
 {
-    "name": "vendor/fal-photo-browser",
+    "name": "dkd-dobberkau/fal-photo-browser",
     "type": "typo3-cms-extension",
     "description": "Stock photo browser for TYPO3 backend - Powered by Unsplash",
     "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Olivier Dobberkau",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/dkd-dobberkau/fal-photo-browser",
+    "support": {
+        "issues": "https://github.com/dkd-dobberkau/fal-photo-browser/issues",
+        "source": "https://github.com/dkd-dobberkau/fal-photo-browser"
+    },
     "require": {
         "php": "^8.2",
         "typo3/cms-core": "^14.0",
@@ -11,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Vendor\\FalPhotoBrowser\\": "Classes/"
+            "DkdDobberkau\\FalPhotoBrowser\\": "Classes/"
         }
     },
     "extra": {

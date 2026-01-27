@@ -24,7 +24,7 @@ A TYPO3 extension for searching and importing stock photos directly in the TYPO3
 ### Via Composer (recommended)
 
 ```bash
-composer require vendor/fal-photo-browser
+composer require dkd-dobberkau/fal-photo-browser
 ```
 
 ### Manual Installation
@@ -44,7 +44,7 @@ composer require vendor/fal-photo-browser
 }
 ```
 
-4. Run `composer require vendor/fal-photo-browser:@dev`
+4. Run `composer require dkd-dobberkau/fal-photo-browser:@dev`
 
 ### Activate Extension
 

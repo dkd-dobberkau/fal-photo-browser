@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Vendor\FalPhotoBrowser\Service;
+namespace DkdDobberkau\FalPhotoBrowser\Service;
 
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Vendor\FalPhotoBrowser\Domain\Dto\UnsplashPhoto;
+use DkdDobberkau\FalPhotoBrowser\Domain\Dto\UnsplashPhoto;
 
 final class FileImportService
 {
