@@ -1,0 +1,22 @@
+{
+    "name": "vendor/t3-unsplash",
+    "type": "typo3-cms-extension",
+    "description": "Unsplash image integration for TYPO3 backend",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "^8.2",
+        "typo3/cms-core": "^14.0",
+        "typo3/cms-backend": "^14.0",
+        "symfony/http-client": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vendor\\T3Unsplash\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "t3_unsplash"
+        }
+    }
+}
