@@ -72,10 +72,10 @@ final class FileImportService
             'creator' => $photo->photographerName,
             'creator_tool' => 'Unsplash',
             'source' => $photo->unsplashUrl,
-            'copyright' => sprintf(
-                'Photo by %s on Unsplash',
-                $photo->photographerName
-            ),
+            'copyright' => sprintf('Photo by %s on Unsplash', $photo->photographerName),
+            'unsplash_photo_id' => $photo->id,
+            'unsplash_photo_url' => $photo->unsplashUrl,
+            'unsplash_photographer_url' => $photo->photographerUrl,
         ]);
 
         // Cleanup temp file
