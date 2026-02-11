@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Http\JsonResponse;
+use DkdDobberkau\FalPhotoBrowser\Service\AiChatService;
 use DkdDobberkau\FalPhotoBrowser\Service\FileImportService;
 use DkdDobberkau\FalPhotoBrowser\Service\UnsplashApiService;
 
@@ -19,6 +20,7 @@ final class PhotoBrowserController
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly UnsplashApiService $unsplashApiService,
         private readonly FileImportService $fileImportService,
+        private readonly AiChatService $aiChatService,
     ) {}
 
     public function indexAction(ServerRequestInterface $request): ResponseInterface
@@ -27,6 +29,7 @@ final class PhotoBrowserController
 
         $moduleTemplate->assignMultiple([
             'isConfigured' => $this->unsplashApiService->isConfigured(),
+            'isChatConfigured' => $this->aiChatService->isConfigured(),
             'orientations' => [
                 '' => 'All',
                 'landscape' => 'Landscape',
@@ -104,6 +107,53 @@ final class PhotoBrowserController
                     'path' => $file->getPublicUrl(),
                     'identifier' => $file->getCombinedIdentifier(),
                 ],
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function chatAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $body = json_decode($request->getBody()->getContents(), true);
+        $userMessage = $body['message'] ?? '';
+        $conversationHistory = $body['history'] ?? [];
+
+        if ($userMessage === '') {
+            return new JsonResponse(['success' => false, 'error' => 'No message provided'], 400);
+        }
+
+        if (!$this->aiChatService->isConfigured()) {
+            return new JsonResponse(['success' => false, 'error' => 'AI chat not configured. Set ANTHROPIC_API_KEY.'], 503);
+        }
+
+        try {
+            $aiResponse = $this->aiChatService->chat($userMessage, $conversationHistory);
+
+            $searchResults = null;
+            if ($aiResponse['searchTerms'] !== '') {
+                $result = $this->unsplashApiService->search(
+                    query: $aiResponse['searchTerms'],
+                    page: 1,
+                    perPage: 30,
+                    orientation: $aiResponse['orientation'],
+                    color: $aiResponse['color'],
+                );
+                $searchResults = [
+                    'photos' => array_map(fn($photo) => $photo->toArray(), $result['photos']),
+                    'total' => $result['total'],
+                    'totalPages' => $result['totalPages'],
+                    'page' => 1,
+                ];
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'chat' => $aiResponse,
+                'search' => $searchResults,
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([

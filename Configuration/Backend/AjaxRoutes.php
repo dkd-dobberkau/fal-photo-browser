@@ -12,6 +12,11 @@ return [
         'methods' => ['POST'],
         'target' => PhotoBrowserController::class . '::importAction',
     ],
+    'falphotobrowser_chat' => [
+        'path' => '/photobrowser/chat',
+        'methods' => ['POST'],
+        'target' => PhotoBrowserController::class . '::chatAction',
+    ],
     'falphotobrowser_collections' => [
         'path' => '/photobrowser/collections',
         'target' => PhotoBrowserController::class . '::collectionsAction',

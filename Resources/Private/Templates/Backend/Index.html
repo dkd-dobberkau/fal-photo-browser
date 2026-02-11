@@ -12,10 +12,10 @@
 <f:section name="Content">
     <f:if condition="{isConfigured}">
         <f:then>
-            <div class="photobrowser" id="photobrowser">
+            <div class="photobrowser" id="photobrowser" data-chat-configured="{f:if(condition: isChatConfigured, then: '1', else: '0')}">
                 <div class="photobrowser-search-form">
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <div class="input-group">
                                 <input type="text"
                                        class="form-control"
@@ -27,37 +27,77 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <select class="form-select" id="photobrowser-orientation">
                                 <f:for each="{orientations}" as="label" key="value">
                                     <option value="{value}">{label}</option>
                                 </f:for>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <select class="form-select" id="photobrowser-color">
                                 <f:for each="{colors}" as="label" key="value">
                                     <option value="{value}">{label}</option>
                                 </f:for>
                             </select>
                         </div>
+                        <f:if condition="{isChatConfigured}">
+                            <div class="col-md-3 text-end">
+                                <button class="btn btn-default" type="button" id="photobrowser-chat-toggle">
+                                    <span class="chat-toggle-icon">AI</span> Photo Assistant
+                                </button>
+                            </div>
+                        </f:if>
                     </div>
                 </div>
 
                 <p class="text-muted small mb-3">Powered by <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></p>
 
-                <div id="photobrowser-results" class="photobrowser-results"></div>
+                <div class="photobrowser-main-layout">
+                    <div class="photobrowser-content">
+                        <div id="photobrowser-results" class="photobrowser-results"></div>
 
-                <div id="photobrowser-pagination" class="photobrowser-pagination mt-4" style="display: none;">
-                    <button class="btn btn-default" id="photobrowser-load-more">
-                        Load more
-                    </button>
-                </div>
+                        <div id="photobrowser-pagination" class="photobrowser-pagination mt-4" style="display: none;">
+                            <button class="btn btn-default" id="photobrowser-load-more">
+                                Load more
+                            </button>
+                        </div>
 
-                <div id="photobrowser-loading" class="photobrowser-loading" style="display: none;">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <div id="photobrowser-loading" class="photobrowser-loading" style="display: none;">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <f:if condition="{isChatConfigured}">
+                        <div id="photobrowser-chat-panel" class="photobrowser-chat-panel" style="display: none;">
+                            <div class="chat-panel-header">
+                                <strong>Photo Assistant</strong>
+                                <button class="btn btn-sm btn-link" id="photobrowser-chat-close" title="Close">&times;</button>
+                            </div>
+                            <div class="chat-messages" id="photobrowser-chat-messages">
+                                <div class="chat-message chat-message-ai">
+                                    <div class="chat-bubble">
+                                        Describe what kind of photo you're looking for and I'll help you find it.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-suggestions" id="photobrowser-chat-suggestions"></div>
+                            <div class="chat-input-area">
+                                <div class="input-group">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="photobrowser-chat-input"
+                                           placeholder="Describe the photo you need..."
+                                           autocomplete="off">
+                                    <button class="btn btn-primary" type="button" id="photobrowser-chat-send">
+                                        Send
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </f:if>
                 </div>
             </div>
         </f:then>

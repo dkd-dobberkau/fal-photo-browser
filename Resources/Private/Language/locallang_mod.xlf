@@ -12,6 +12,21 @@
             <trans-unit id="mlang_labels_tablabel" resname="mlang_labels_tablabel">
                 <source>Photo Browser</source>
             </trans-unit>
+            <trans-unit id="chat.toggle" resname="chat.toggle">
+                <source>Photo Assistant</source>
+            </trans-unit>
+            <trans-unit id="chat.title" resname="chat.title">
+                <source>Photo Assistant</source>
+            </trans-unit>
+            <trans-unit id="chat.welcome" resname="chat.welcome">
+                <source>Describe what kind of photo you're looking for and I'll help you find it.</source>
+            </trans-unit>
+            <trans-unit id="chat.placeholder" resname="chat.placeholder">
+                <source>Describe the photo you need...</source>
+            </trans-unit>
+            <trans-unit id="chat.send" resname="chat.send">
+                <source>Send</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
