@@ -94,6 +94,12 @@ PROMPT;
         $data = $response->toArray();
         $content = $data['content'][0]['text'] ?? '';
 
+        // Strip markdown code blocks if present
+        $content = trim($content);
+        if (preg_match('/^```(?:json)?\s*\n?(.*?)\n?\s*```$/s', $content, $matches)) {
+            $content = trim($matches[1]);
+        }
+
         $parsed = json_decode($content, true);
 
         if (!is_array($parsed) || !isset($parsed['searchTerms'])) {
