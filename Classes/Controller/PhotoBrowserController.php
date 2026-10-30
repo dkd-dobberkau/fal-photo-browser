@@ -127,7 +127,7 @@ final class PhotoBrowserController
         }
 
         if (!$this->aiChatService->isConfigured()) {
-            return new JsonResponse(['success' => false, 'error' => 'AI chat not configured. Set ANTHROPIC_API_KEY.'], 503);
+            return new JsonResponse(['success' => false, 'error' => 'AI chat not configured. Set up a provider in EXT:aim or set ANTHROPIC_API_KEY.'], 503);
         }
 
         try {

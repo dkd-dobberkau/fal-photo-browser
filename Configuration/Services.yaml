@@ -6,3 +6,8 @@ services:
 
   DkdDobberkau\FalPhotoBrowser\:
     resource: '../Classes/*'
+    exclude: '../Classes/Service/AimClient.php'
+
+  DkdDobberkau\FalPhotoBrowser\Service\AiChatService:
+    arguments:
+      $aimClient: '@?DkdDobberkau\FalPhotoBrowser\Service\AimClient'

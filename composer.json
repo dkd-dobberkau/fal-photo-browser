@@ -21,6 +21,9 @@
         "typo3/cms-backend": "^14.0",
         "symfony/http-client": "^7.0"
     },
+    "suggest": {
+        "b13/aim": "Run the Photo Assistant through a provider managed in EXT:aim"
+    },
     "autoload": {
         "psr-4": {
             "DkdDobberkau\\FalPhotoBrowser\\": "Classes/"

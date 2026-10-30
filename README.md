@@ -21,7 +21,7 @@ A TYPO3 extension for searching and importing stock photos directly in the TYPO3
 - TYPO3 v14.0+
 - PHP 8.2+
 - Unsplash API Access Key ([Get one here](https://unsplash.com/developers))
-- Anthropic API key for the optional Photo Assistant ([Get one here](https://console.anthropic.com/))
+- For the optional Photo Assistant: [EXT:aim](https://packagist.org/packages/b13/aim) with a configured provider, or an Anthropic API key ([Get one here](https://console.anthropic.com/))
 
 ## Installation
 
@@ -90,7 +90,21 @@ environment:
 
 ### Photo Assistant (optional)
 
-The Photo Assistant uses the Claude API. To enable it, set the `ANTHROPIC_API_KEY` environment variable the same way as `UNSPLASH_ACCESS_KEY` above:
+The Photo Assistant can run through `EXT:aim` or call the Claude API directly. If `EXT:aim` is installed and has an enabled provider with conversation support, the assistant uses it. Otherwise it falls back to the Claude API.
+
+#### With EXT:aim
+
+Requires `b13/aim` and a Symfony AI bridge for your provider, for example:
+
+```bash
+composer require b13/aim:^0.4.1 symfony/ai-platform:^0.11 symfony/ai-anthropic-platform:^0.11
+```
+
+Then create a provider in the AiM backend module. API key, model, and request logging are managed there. EXT:aim 0.4 always sends a `temperature`, so choose a model that accepts it, such as `claude-sonnet-4-6`. Claude Sonnet 5 and newer reject it.
+
+#### With an Anthropic API key
+
+Set the `ANTHROPIC_API_KEY` environment variable the same way as `UNSPLASH_ACCESS_KEY` above:
 
 ```yaml
 web_environment:
@@ -195,9 +209,9 @@ This extension follows [Unsplash API Guidelines](https://help.unsplash.com/en/ar
 
 ## Data Protection
 
-The Photo Assistant sends the messages you type, including the earlier messages of the conversation, to the [Anthropic API](https://www.anthropic.com/). The search terms it creates are sent to the Unsplash API. Do not enter personal or confidential data in the chat, and check whether your organization needs a data processing agreement before you enable it.
+The Photo Assistant sends the messages you type, including the earlier messages of the conversation, to the [Anthropic API](https://www.anthropic.com/) or, with `EXT:aim`, to the provider configured there. The search terms it creates are sent to the Unsplash API. Do not enter personal or confidential data in the chat, and check whether your organization needs a data processing agreement before you enable it.
 
-Without `ANTHROPIC_API_KEY`, no data is sent to Anthropic.
+If neither is set up, no chat data leaves your installation.
 
 ## Support
 
