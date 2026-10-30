@@ -75,6 +75,7 @@ final class FileImportService
             'copyright' => sprintf('Photo by %s on Unsplash', $photo->photographerName),
             'unsplash_photo_id' => $photo->id,
             'unsplash_photo_url' => $photo->unsplashUrl,
+            'unsplash_photographer_name' => $photo->photographerName,
             'unsplash_photographer_url' => $photo->photographerUrl,
         ]);
 
