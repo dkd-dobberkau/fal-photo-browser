@@ -10,7 +10,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class AiChatService
 {
     private const API_URL = 'https://api.anthropic.com/v1/messages';
-    private const MODEL = 'claude-sonnet-4-5-20250929';
+    private const MODEL = 'claude-sonnet-5-5';
+    // Thinking counts toward max_tokens, so the limit must cover more than the reply.
+    private const MAX_TOKENS = 8000;
 
     private HttpClientInterface $httpClient;
     private ?string $apiKey;
@@ -85,14 +87,15 @@ PROMPT;
             ],
             'json' => [
                 'model' => self::MODEL,
-                'max_tokens' => 1024,
+                'max_tokens' => self::MAX_TOKENS,
+                'output_config' => ['effort' => 'low'],
                 'system' => self::SYSTEM_PROMPT,
                 'messages' => $messages,
             ],
         ]);
 
         $data = $response->toArray();
-        $content = $data['content'][0]['text'] ?? '';
+        $content = $this->extractText($data);
 
         // Strip markdown code blocks if present
         $content = trim($content);
@@ -121,5 +124,26 @@ PROMPT;
             'color' => $parsed['color'] ?? null,
             'suggestions' => $parsed['suggestions'] ?? [],
         ];
+    }
+
+    /**
+     * Reads text by block type, responses can start with a thinking block.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function extractText(array $data): string
+    {
+        if (($data['stop_reason'] ?? null) === 'refusal') {
+            return 'Diese Anfrage kann ich leider nicht bearbeiten.';
+        }
+
+        $text = '';
+        foreach ($data['content'] ?? [] as $block) {
+            if (($block['type'] ?? null) === 'text') {
+                $text .= $block['text'] ?? '';
+            }
+        }
+
+        return $text;
     }
 }
