@@ -11,9 +11,9 @@ A TYPO3 extension for searching and importing stock photos directly in the TYPO3
 - **Backend Module**: Dedicated module under "Media" for browsing and importing photos
 - **Advanced Search**: Filter by text, orientation (landscape, portrait, square), and color
 - **Local Import**: Downloads images to your fileadmin for GDPR compliance and performance
-- **Automatic Metadata**: Populates title, description, and alt text, plus photographer and copyright info if `EXT:filemetadata` is installed
+- **Automatic Metadata**: Populates title, description, and alt text, and photographer info, plus copyright and source if `EXT:filemetadata` is installed
 - **Download Tracking**: Complies with Unsplash API guidelines by tracking downloads
-- **Custom Metadata Fields**: Stores Unsplash photo ID, URL, and photographer URL for reference
+- **Custom Metadata Fields**: Stores Unsplash photo ID, URL, and photographer name and URL for reference
 - **AI Photo Assistant (optional)**: Describe the photo you need in your own words and get matching search terms and filters
 
 ## Requirements
@@ -122,10 +122,10 @@ Imported images are stored in `fileadmin/unsplash/YYYY/MM/` with full metadata i
 
 - Title and description
 - Alt text
-- Photographer URL
+- Photographer name and URL
 - Original Unsplash URL
 
-The photographer name, copyright notice, and source are only stored if the TYPO3 system extension `EXT:filemetadata` (`typo3/cms-filemetadata`) is installed, because it provides these fields.
+If the TYPO3 system extension `EXT:filemetadata` (`typo3/cms-filemetadata`) is installed, the creator, copyright notice, and source fields are filled as well.
 
 ## File Structure
 
@@ -177,6 +177,7 @@ The extension adds custom fields to `sys_file_metadata`:
 |-------|-------------|
 | `unsplash_photo_id` | Original Unsplash photo ID |
 | `unsplash_photo_url` | Link to photo on Unsplash |
+| `unsplash_photographer_name` | Photographer's name |
 | `unsplash_photographer_url` | Link to photographer's profile |
 
 These fields appear in a dedicated "Unsplash" tab when editing file metadata.
@@ -188,7 +189,7 @@ These fields appear in a dedicated "Unsplash" tab when editing file metadata.
 This extension follows [Unsplash API Guidelines](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines):
 
 - Downloads are tracked via the API (required)
-- Photographer attribution is stored in metadata (the photographer URL, and the name if `EXT:filemetadata` is installed)
+- Photographer attribution is stored in metadata
 - "Powered by Unsplash" attribution in the UI
 - Images are hotlink-free (downloaded locally)
 

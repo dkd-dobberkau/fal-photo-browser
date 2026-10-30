@@ -17,6 +17,13 @@ $columns = [
             'readOnly' => true,
         ],
     ],
+    'unsplash_photographer_name' => [
+        'label' => 'Photographer',
+        'config' => [
+            'type' => 'input',
+            'readOnly' => true,
+        ],
+    ],
     'unsplash_photographer_url' => [
         'label' => 'Photographer URL',
         'config' => [
@@ -29,5 +36,5 @@ $columns = [
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file_metadata', $columns);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
     'sys_file_metadata',
-    '--div--;Unsplash,unsplash_photo_id,unsplash_photo_url,unsplash_photographer_url'
+    '--div--;Unsplash,unsplash_photo_id,unsplash_photo_url,unsplash_photographer_name,unsplash_photographer_url'
 );
