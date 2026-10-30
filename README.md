@@ -12,12 +12,14 @@ A TYPO3 extension for searching and importing stock photos directly in the TYPO3
 - **Automatic Metadata**: Populates title, description, alt text, copyright, and photographer info
 - **Download Tracking**: Complies with Unsplash API guidelines by tracking downloads
 - **Custom Metadata Fields**: Stores Unsplash photo ID, URL, and photographer URL for reference
+- **AI Chat Assistant (optional)**: Describe the photo you need in your own words and get matching search terms and filters
 
 ## Requirements
 
 - TYPO3 v14.0+
 - PHP 8.2+
 - Unsplash API Access Key ([Get one here](https://unsplash.com/developers))
+- Anthropic API key for the optional AI chat ([Get one here](https://console.anthropic.com/))
 
 ## Installation
 
@@ -84,6 +86,17 @@ environment:
   - UNSPLASH_ACCESS_KEY=your_access_key_here
 ```
 
+### AI Chat (optional)
+
+The AI chat uses the Claude API. To enable it, set the `ANTHROPIC_API_KEY` environment variable the same way as `UNSPLASH_ACCESS_KEY` above:
+
+```yaml
+web_environment:
+  - ANTHROPIC_API_KEY=your_api_key_here
+```
+
+Photo search and import work without this key.
+
 ### Content Security Policy
 
 The extension automatically registers CSP rules to allow loading thumbnail images from `images.unsplash.com` in the backend.
@@ -94,6 +107,12 @@ The extension automatically registers CSP rules to allow loading thumbnail image
 2. Enter a search term (e.g., "mountains", "office", "technology")
 3. Optionally filter by orientation or color
 4. Click **Import** on any photo to download it
+
+### AI Chat
+
+If the AI chat is enabled, you can describe what you need instead of searching by keyword, for example "a cozy café in the morning". The assistant replies in your language, creates English search terms, suggests orientation and color filters, and offers follow-up ideas to refine the search.
+
+### Imported Images
 
 Imported images are stored in `fileadmin/unsplash/YYYY/MM/` with full metadata including:
 
@@ -166,6 +185,12 @@ This extension follows [Unsplash API Guidelines](https://help.unsplash.com/en/ar
 - "Powered by Unsplash" attribution in the UI
 - Images are hotlink-free (downloaded locally)
 
+## Data Protection
+
+The AI chat sends the messages you type, including the earlier messages of the conversation, to the [Anthropic API](https://www.anthropic.com/). The search terms it creates are sent to the Unsplash API. Do not enter personal or confidential data in the chat, and check whether your organization needs a data processing agreement before you enable it.
+
+Without `ANTHROPIC_API_KEY`, no data is sent to Anthropic.
+
 ## License
 
 GPL-2.0-or-later
@@ -173,4 +198,5 @@ GPL-2.0-or-later
 ## Credits
 
 - Photos provided by [Unsplash](https://unsplash.com)
+- AI chat powered by [Claude](https://www.anthropic.com/claude)
 - Built for TYPO3 CMS
