@@ -233,6 +233,9 @@
     font-size: 11px;
     padding: 3px 10px;
     border-radius: 16px;
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
 }
 
 /* Chat Input */
