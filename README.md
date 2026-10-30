@@ -94,13 +94,13 @@ The Photo Assistant can run through `EXT:aim` or call the Claude API directly. I
 
 #### With EXT:aim
 
-Requires `b13/aim` and a Symfony AI bridge for your provider, for example:
+Requires `b13/aim` 0.5.1 or newer and a Symfony AI bridge for your provider, for example:
 
 ```bash
-composer require b13/aim:^0.4.1 symfony/ai-platform:^0.11 symfony/ai-anthropic-platform:^0.11
+composer require b13/aim:^0.5.1 symfony/ai-platform:^0.15 symfony/ai-anthropic-platform:^0.15
 ```
 
-Then create a provider in the AiM backend module. API key, model, and request logging are managed there. EXT:aim 0.4 always sends a `temperature`, so choose a model that accepts it, such as `claude-sonnet-4-6`. Claude Sonnet 5 and newer reject it.
+Then create a provider in the AiM backend module. API key, model, and request logging are managed there. Tested with `claude-sonnet-5-5`. EXT:aim states that it is tested up to Symfony AI 0.11, which does not know this model yet, so use `symfony/ai-platform:^0.11` if you prefer `claude-sonnet-5` or older.
 
 #### With an Anthropic API key
 

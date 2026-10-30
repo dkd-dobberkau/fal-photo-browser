@@ -15,7 +15,8 @@ use B13\Aim\Request\Message\UserMessage;
  */
 final class AimClient implements AiClientInterface
 {
-    private const MAX_TOKENS = 2000;
+    // Thinking counts toward max_tokens, so the limit must cover more than the reply.
+    private const MAX_TOKENS = 8000;
     private const EXTENSION_KEY = 'dkd_fal_photo_browser';
 
     public function __construct(
