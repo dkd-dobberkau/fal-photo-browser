@@ -4,7 +4,7 @@ A TYPO3 extension for searching and importing stock photos directly in the TYPO3
 
 **Powered by [Unsplash](https://unsplash.com)**
 
-![Photo search results in the TYPO3 backend](Resources/Public/Screenshots/photo-search.jpg)
+![Photo search results in the TYPO3 backend](https://raw.githubusercontent.com/dkd-dobberkau/fal-photo-browser/main/Resources/Public/Screenshots/photo-search.jpg)
 
 ## Features
 
@@ -114,7 +114,7 @@ The extension automatically registers CSP rules to allow loading thumbnail image
 
 If the Photo Assistant is enabled, click **Photo Assistant** and describe what you need instead of searching by keyword, for example "a cozy café in the morning". The assistant replies in your language, creates English search terms, suggests orientation and color filters, and offers follow-up ideas to refine the search.
 
-![The Photo Assistant suggesting search terms and filters](Resources/Public/Screenshots/photo-assistant.jpg)
+![The Photo Assistant suggesting search terms and filters](https://raw.githubusercontent.com/dkd-dobberkau/fal-photo-browser/main/Resources/Public/Screenshots/photo-assistant.jpg)
 
 ### Imported Images
 
@@ -181,7 +181,7 @@ The extension adds custom fields to `sys_file_metadata`:
 
 These fields appear in a dedicated "Unsplash" tab when editing file metadata.
 
-![The Unsplash tab in the file metadata form](Resources/Public/Screenshots/metadata-unsplash-tab.jpg)
+![The Unsplash tab in the file metadata form](https://raw.githubusercontent.com/dkd-dobberkau/fal-photo-browser/main/Resources/Public/Screenshots/metadata-unsplash-tab.jpg)
 
 ## API Compliance
 
