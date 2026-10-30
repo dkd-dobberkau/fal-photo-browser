@@ -11,6 +11,7 @@
     ],
     "homepage": "https://github.com/dkd-dobberkau/fal-photo-browser",
     "support": {
+        "docs": "https://docs.typo3.org/p/dkd-dobberkau/fal-photo-browser/main/en-us/",
         "issues": "https://github.com/dkd-dobberkau/fal-photo-browser/issues",
         "source": "https://github.com/dkd-dobberkau/fal-photo-browser"
     },
