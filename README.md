@@ -4,22 +4,24 @@ A TYPO3 extension for searching and importing stock photos directly in the TYPO3
 
 **Powered by [Unsplash](https://unsplash.com)**
 
+![Photo search results in the TYPO3 backend](Resources/Public/Screenshots/photo-search.jpg)
+
 ## Features
 
 - **Backend Module**: Dedicated module under "Media" for browsing and importing photos
 - **Advanced Search**: Filter by text, orientation (landscape, portrait, square), and color
 - **Local Import**: Downloads images to your fileadmin for GDPR compliance and performance
-- **Automatic Metadata**: Populates title, description, alt text, copyright, and photographer info
+- **Automatic Metadata**: Populates title, description, and alt text, plus photographer and copyright info if `EXT:filemetadata` is installed
 - **Download Tracking**: Complies with Unsplash API guidelines by tracking downloads
 - **Custom Metadata Fields**: Stores Unsplash photo ID, URL, and photographer URL for reference
-- **AI Chat Assistant (optional)**: Describe the photo you need in your own words and get matching search terms and filters
+- **AI Photo Assistant (optional)**: Describe the photo you need in your own words and get matching search terms and filters
 
 ## Requirements
 
 - TYPO3 v14.0+
 - PHP 8.2+
 - Unsplash API Access Key ([Get one here](https://unsplash.com/developers))
-- Anthropic API key for the optional AI chat ([Get one here](https://console.anthropic.com/))
+- Anthropic API key for the optional Photo Assistant ([Get one here](https://console.anthropic.com/))
 
 ## Installation
 
@@ -86,9 +88,9 @@ environment:
   - UNSPLASH_ACCESS_KEY=your_access_key_here
 ```
 
-### AI Chat (optional)
+### Photo Assistant (optional)
 
-The AI chat uses the Claude API. To enable it, set the `ANTHROPIC_API_KEY` environment variable the same way as `UNSPLASH_ACCESS_KEY` above:
+The Photo Assistant uses the Claude API. To enable it, set the `ANTHROPIC_API_KEY` environment variable the same way as `UNSPLASH_ACCESS_KEY` above:
 
 ```yaml
 web_environment:
@@ -108,9 +110,11 @@ The extension automatically registers CSP rules to allow loading thumbnail image
 3. Optionally filter by orientation or color
 4. Click **Import** on any photo to download it
 
-### AI Chat
+### Photo Assistant
 
-If the AI chat is enabled, you can describe what you need instead of searching by keyword, for example "a cozy café in the morning". The assistant replies in your language, creates English search terms, suggests orientation and color filters, and offers follow-up ideas to refine the search.
+If the Photo Assistant is enabled, click **Photo Assistant** and describe what you need instead of searching by keyword, for example "a cozy café in the morning". The assistant replies in your language, creates English search terms, suggests orientation and color filters, and offers follow-up ideas to refine the search.
+
+![The Photo Assistant suggesting search terms and filters](Resources/Public/Screenshots/photo-assistant.jpg)
 
 ### Imported Images
 
@@ -118,9 +122,10 @@ Imported images are stored in `fileadmin/unsplash/YYYY/MM/` with full metadata i
 
 - Title and description
 - Alt text
-- Photographer name and URL
-- Copyright notice
+- Photographer URL
 - Original Unsplash URL
+
+The photographer name, copyright notice, and source are only stored if the TYPO3 system extension `EXT:filemetadata` (`typo3/cms-filemetadata`) is installed, because it provides these fields.
 
 ## File Structure
 
@@ -176,18 +181,20 @@ The extension adds custom fields to `sys_file_metadata`:
 
 These fields appear in a dedicated "Unsplash" tab when editing file metadata.
 
+![The Unsplash tab in the file metadata form](Resources/Public/Screenshots/metadata-unsplash-tab.jpg)
+
 ## API Compliance
 
 This extension follows [Unsplash API Guidelines](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines):
 
 - Downloads are tracked via the API (required)
-- Photographer attribution is stored in metadata
+- Photographer attribution is stored in metadata (the photographer URL, and the name if `EXT:filemetadata` is installed)
 - "Powered by Unsplash" attribution in the UI
 - Images are hotlink-free (downloaded locally)
 
 ## Data Protection
 
-The AI chat sends the messages you type, including the earlier messages of the conversation, to the [Anthropic API](https://www.anthropic.com/). The search terms it creates are sent to the Unsplash API. Do not enter personal or confidential data in the chat, and check whether your organization needs a data processing agreement before you enable it.
+The Photo Assistant sends the messages you type, including the earlier messages of the conversation, to the [Anthropic API](https://www.anthropic.com/). The search terms it creates are sent to the Unsplash API. Do not enter personal or confidential data in the chat, and check whether your organization needs a data processing agreement before you enable it.
 
 Without `ANTHROPIC_API_KEY`, no data is sent to Anthropic.
 
@@ -202,5 +209,5 @@ GPL-2.0-or-later
 ## Credits
 
 - Photos provided by [Unsplash](https://unsplash.com)
-- AI chat powered by [Claude](https://www.anthropic.com/claude)
+- Photo Assistant powered by [Claude](https://www.anthropic.com/claude)
 - Built for TYPO3 CMS
