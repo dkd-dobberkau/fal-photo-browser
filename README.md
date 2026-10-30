@@ -191,6 +191,10 @@ The AI chat sends the messages you type, including the earlier messages of the c
 
 Without `ANTHROPIC_API_KEY`, no data is sent to Anthropic.
 
+## Support
+
+Please report bugs and feature requests in the [GitHub issue tracker](https://github.com/dkd-dobberkau/fal-photo-browser/issues).
+
 ## License
 
 GPL-2.0-or-later
