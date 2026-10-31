@@ -10,6 +10,8 @@ final class AiChatService
     private const MAX_HISTORY_ENTRIES = 20;
     private const HISTORY_ROLES = ['user', 'assistant'];
 
+    private ?AiClientInterface $selectedClient = null;
+
     private const SYSTEM_PROMPT = <<<'PROMPT'
 You are a photo search assistant integrated into a TYPO3 backend module that searches Unsplash.
 Your job is to help users find the right stock photos based on their descriptions.
@@ -110,6 +112,6 @@ PROMPT;
 
     private function client(): AiClientInterface
     {
-        return $this->aimClient?->isConfigured() ? $this->aimClient : $this->anthropicClient;
+        return $this->selectedClient ??= $this->aimClient?->isConfigured() ? $this->aimClient : $this->anthropicClient;
     }
 }

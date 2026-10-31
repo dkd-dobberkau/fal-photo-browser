@@ -6,7 +6,9 @@ namespace DkdDobberkau\FalPhotoBrowser\Service;
 
 use B13\Aim\Ai;
 use B13\Aim\Capability\ConversationCapableInterface;
-use B13\Aim\Provider\ProviderResolver;
+use B13\Aim\Domain\Repository\ProviderConfigurationRepository;
+use B13\Aim\Registry\AiProviderRegistry;
+use B13\Aim\Registry\DisabledModelRegistry;
 use B13\Aim\Request\Message\AssistantMessage;
 use B13\Aim\Request\Message\UserMessage;
 
@@ -21,16 +23,30 @@ final class AimClient implements AiClientInterface
 
     public function __construct(
         private readonly Ai $ai,
-        private readonly ProviderResolver $providerResolver,
+        private readonly ProviderConfigurationRepository $configurationRepository,
+        private readonly AiProviderRegistry $providerRegistry,
+        private readonly DisabledModelRegistry $disabledModelRegistry,
     ) {}
 
+    /**
+     * Installation-wide on purpose: EXT:aim enforces per-user denials itself, they must not
+     * fall back to the direct client. A failed lookup propagates for the same reason.
+     */
     public function isConfigured(): bool
     {
-        try {
-            return $this->providerResolver->resolveAllForCapability(ConversationCapableInterface::class) !== [];
-        } catch (\Throwable) {
-            return false;
+        foreach ($this->configurationRepository->findAllEnabled() as $configuration) {
+            if ($configuration->disabled
+                || !$this->providerRegistry->hasProvider($configuration->providerIdentifier)
+                || $this->disabledModelRegistry->isDisabled($configuration->providerIdentifier, $configuration->model)
+            ) {
+                continue;
+            }
+            if ($this->providerRegistry->getProvider($configuration->providerIdentifier)->hasCapability(ConversationCapableInterface::class)) {
+                return true;
+            }
         }
+
+        return false;
     }
 
     public function complete(string $systemPrompt, array $messages): string

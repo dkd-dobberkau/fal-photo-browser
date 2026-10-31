@@ -36,7 +36,7 @@ final class PhotoBrowserController
 
         $moduleTemplate->assignMultiple([
             'isConfigured' => $this->unsplashApiService->isConfigured(),
-            'isChatConfigured' => $this->aiChatService->isConfigured(),
+            'isChatConfigured' => $this->isChatAvailable(),
             'orientations' => [
                 '' => 'All',
                 'landscape' => 'Landscape',
@@ -179,6 +179,19 @@ final class PhotoBrowserController
 
             return new JsonResponse(['collections' => $collections]);
         });
+    }
+
+    /**
+     * Keeps photo search usable when the assistant backend cannot be determined.
+     */
+    private function isChatAvailable(): bool
+    {
+        try {
+            return $this->aiChatService->isConfigured();
+        } catch (\Throwable $e) {
+            $this->logger->error('The assistant availability check failed.', ['exception' => $e]);
+            return false;
+        }
     }
 
     /**

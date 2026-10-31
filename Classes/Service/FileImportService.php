@@ -48,12 +48,21 @@ final class FileImportService
 
         $folder = $storage->getFolder($folderPath);
 
+        // Core exempts processing folders from file mount checks
+        if ($storage->isWithinProcessingFolder($folder->getIdentifier())) {
+            throw new \InvalidArgumentException('Target is a processing folder', 1793491208);
+        }
+
         // Check if file already exists
         $fileName = basename($relativePath);
         if ($folder->hasFile($fileName)) {
-            return $this->resourceFactory->getFileObjectFromCombinedIdentifier(
+            $existingFile = $this->resourceFactory->getFileObjectFromCombinedIdentifier(
                 $storageUid . ':/' . $relativePath
             );
+            if (!$existingFile->checkActionPermission('read')) {
+                throw new \RuntimeException('Existing file is not readable', 1793491209);
+            }
+            return $existingFile;
         }
 
         // Trigger download tracking (required by Unsplash guidelines)

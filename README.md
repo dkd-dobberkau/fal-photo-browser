@@ -90,7 +90,7 @@ environment:
 
 ### Photo Assistant (optional)
 
-The Photo Assistant can run through `EXT:aim` or call the Claude API directly. If `EXT:aim` is installed and has an enabled provider with conversation support, the assistant uses it. Otherwise it falls back to the Claude API.
+The Photo Assistant can run through `EXT:aim` or call the Claude API directly. If `EXT:aim` is installed and has an enabled provider with conversation support, the assistant uses it. Otherwise it falls back to the Claude API. The choice applies to the whole installation: if `EXT:aim` denies a user or fails, the request fails and does not fall back.
 
 #### With EXT:aim
 
