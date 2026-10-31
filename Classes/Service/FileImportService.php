@@ -21,12 +21,13 @@ final class FileImportService
     public function importPhoto(UnsplashPhoto $photo, int $storageUid = 1, string $targetFolder = 'unsplash'): File
     {
         $storage = $this->storageRepository->findByUid($storageUid);
-        if ($storage === null) {
+        // The fallback storage has no permission evaluation, so it must stay unreachable.
+        if ($storage === null || $storage->isFallbackStorage()) {
             throw new \InvalidArgumentException('Unknown file storage ' . $storageUid, 1793491201);
         }
-
-        // Trigger download tracking (required by Unsplash guidelines)
-        $downloadUrl = $this->unsplashApiService->triggerDownload($photo->downloadUrl);
+        if (!UnsplashApiService::isValidId($photo->id)) {
+            throw new \InvalidArgumentException('Invalid photo ID in API response', 1793491207);
+        }
 
         // Build target path: unsplash/2026/01/photo-id.jpg
         $date = new \DateTimeImmutable();
@@ -38,12 +39,7 @@ final class FileImportService
             $photo->id
         );
 
-        // Download image
-        $tempFile = GeneralUtility::tempnam('unsplash_');
-        $imageContent = file_get_contents($downloadUrl);
-        file_put_contents($tempFile, $imageContent);
-
-        // Create folder structure
+        // Resolve the folder first, a refused import must not cost a download
         $folderPath = dirname($relativePath);
 
         if (!$storage->hasFolder($folderPath)) {
@@ -55,39 +51,45 @@ final class FileImportService
         // Check if file already exists
         $fileName = basename($relativePath);
         if ($folder->hasFile($fileName)) {
-            unlink($tempFile);
             return $this->resourceFactory->getFileObjectFromCombinedIdentifier(
                 $storageUid . ':/' . $relativePath
             );
         }
 
-        // Add file to storage
-        $file = $storage->addFile($tempFile, $folder, $fileName);
+        // Trigger download tracking (required by Unsplash guidelines)
+        $downloadUrl = $this->unsplashApiService->triggerDownload($photo->downloadUrl);
 
-        // Update metadata
-        $metaDataRepository = GeneralUtility::makeInstance(
-            \TYPO3\CMS\Core\Resource\Index\MetaDataRepository::class
-        );
+        $tempFile = GeneralUtility::tempnam('unsplash_');
+        try {
+            $this->unsplashApiService->downloadImage($downloadUrl, $tempFile);
 
-        $metaDataRepository->update($file->getUid(), [
-            'title' => $photo->altDescription ?: $photo->description,
-            'description' => $photo->description,
-            'alternative' => $photo->altDescription,
-            'creator' => $photo->photographerName,
-            'creator_tool' => 'Unsplash',
-            'source' => $photo->unsplashUrl,
-            'copyright' => sprintf('Photo by %s on Unsplash', $photo->photographerName),
-            'unsplash_photo_id' => $photo->id,
-            'unsplash_photo_url' => $photo->unsplashUrl,
-            'unsplash_photographer_name' => $photo->photographerName,
-            'unsplash_photographer_url' => $photo->photographerUrl,
-        ]);
+            // Add file to storage
+            $file = $storage->addFile($tempFile, $folder, $fileName);
 
-        // Cleanup temp file
-        if (file_exists($tempFile)) {
-            unlink($tempFile);
+            // Update metadata
+            $metaDataRepository = GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Resource\Index\MetaDataRepository::class
+            );
+
+            $metaDataRepository->update($file->getUid(), [
+                'title' => $photo->altDescription ?: $photo->description,
+                'description' => $photo->description,
+                'alternative' => $photo->altDescription,
+                'creator' => $photo->photographerName,
+                'creator_tool' => 'Unsplash',
+                'source' => $photo->unsplashUrl,
+                'copyright' => sprintf('Photo by %s on Unsplash', $photo->photographerName),
+                'unsplash_photo_id' => $photo->id,
+                'unsplash_photo_url' => $photo->unsplashUrl,
+                'unsplash_photographer_name' => $photo->photographerName,
+                'unsplash_photographer_url' => $photo->photographerUrl,
+            ]);
+
+            return $file;
+        } finally {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
         }
-
-        return $file;
     }
 }

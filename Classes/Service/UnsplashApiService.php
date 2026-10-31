@@ -12,6 +12,9 @@ final class UnsplashApiService
 {
     private const API_BASE = 'https://api.unsplash.com/';
     private const ID_PATTERN = '/^[A-Za-z0-9_-]+\z/';
+    private const IMAGE_URL_PATTERN = '#^https://([a-z0-9-]+\.)*unsplash\.com/#i';
+    private const MAX_IMAGE_BYTES = 52428800;
+    private const DOWNLOAD_TIMEOUT_SECONDS = 60;
 
     private HttpClientInterface $httpClient;
     private ?string $accessKey;
@@ -19,7 +22,8 @@ final class UnsplashApiService
     public function __construct()
     {
         $this->accessKey = $_ENV['UNSPLASH_ACCESS_KEY'] ?? getenv('UNSPLASH_ACCESS_KEY') ?: null;
-        // Scoped to the API host, so the key is not sent to any other URL.
+        // Absolute URLs on other hosts get no key. Scheme-relative URLs do, so response
+        // supplied URLs must be checked before they reach this client.
         $this->httpClient = HttpClient::createForBaseUri(self::API_BASE, [
             'headers' => [
                 'Accept-Version' => 'v1',
@@ -133,10 +137,52 @@ final class UnsplashApiService
      */
     public function triggerDownload(string $downloadLocationUrl): string
     {
+        if (!str_starts_with($downloadLocationUrl, self::API_BASE)) {
+            throw new \InvalidArgumentException('Unexpected download location', 1793491202);
+        }
+
         $response = $this->httpClient->request('GET', $downloadLocationUrl);
 
         $data = $response->toArray();
         return $data['url'];
+    }
+
+    /**
+     * Streams the image to a file, the URL comes from an API response and is not trusted.
+     */
+    public function downloadImage(string $imageUrl, string $targetFile): void
+    {
+        if (preg_match(self::IMAGE_URL_PATTERN, $imageUrl) !== 1) {
+            throw new \InvalidArgumentException('Unexpected image URL', 1793491203);
+        }
+
+        $response = $this->httpClient->request('GET', $imageUrl, [
+            'max_redirects' => 0,
+            'max_duration' => self::DOWNLOAD_TIMEOUT_SECONDS,
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            throw new \RuntimeException('Image download failed', 1793491204);
+        }
+
+        $handle = fopen($targetFile, 'wb');
+        $size = 0;
+        try {
+            foreach ($this->httpClient->stream($response) as $chunk) {
+                $content = $chunk->getContent();
+                $size += strlen($content);
+                if ($size > self::MAX_IMAGE_BYTES) {
+                    $response->cancel();
+                    throw new \RuntimeException('Image exceeds the size limit', 1793491205);
+                }
+                fwrite($handle, $content);
+            }
+        } finally {
+            fclose($handle);
+        }
+
+        if ($size === 0) {
+            throw new \RuntimeException('Image download was empty', 1793491206);
+        }
     }
 
     private function assertValidId(string $id): void

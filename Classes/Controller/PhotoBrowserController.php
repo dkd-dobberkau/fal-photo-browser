@@ -96,7 +96,7 @@ final class PhotoBrowserController
         return $this->handleAjax('The photo could not be imported.', function () use ($request): ResponseInterface {
             $body = $this->jsonBody($request);
             $photoId = $this->stringValue($body, 'photoId');
-            $storageUid = (int)($body['storageUid'] ?? 1);
+            $storageUid = filter_var($body['storageUid'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
             $targetFolder = $this->stringValue($body, 'targetFolder', 'unsplash');
 
             if ($photoId === '') {
@@ -104,6 +104,9 @@ final class PhotoBrowserController
             }
             if (!UnsplashApiService::isValidId($photoId)) {
                 return new JsonResponse(['success' => false, 'error' => 'Invalid photo ID'], 400);
+            }
+            if ($storageUid === false) {
+                return new JsonResponse(['success' => false, 'error' => 'Invalid storage'], 400);
             }
             if (preg_match(self::TARGET_FOLDER_PATTERN, $targetFolder) !== 1) {
                 return new JsonResponse(['success' => false, 'error' => 'Invalid target folder'], 400);
