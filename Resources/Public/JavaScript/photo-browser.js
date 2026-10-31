@@ -230,6 +230,9 @@ class PhotoBrowser {
 
         try {
             const response = await fetch(TYPO3.settings.ajaxUrls.falphotobrowser_search + '&' + params);
+            if (!response.ok) {
+                throw new Error('Search request failed with status ' + response.status);
+            }
             const data = await response.json();
 
             this.totalPages = data.totalPages;
@@ -256,20 +259,30 @@ class PhotoBrowser {
             const card = document.createElement('div');
             card.className = 'photobrowser-photo-card';
             card.style.backgroundColor = photo.color;
-            card.innerHTML = `
-                <img src="${photo.thumbUrl}" alt="${photo.altDescription}" loading="lazy">
-                <div class="photobrowser-photo-overlay">
-                    <span class="photographer">${photo.photographerName}</span>
-                    <button class="btn btn-sm btn-primary import-btn" data-photo-id="${photo.id}">
-                        Import
-                    </button>
-                </div>
-            `;
 
-            card.querySelector('.import-btn').addEventListener('click', (e) => {
+            const image = document.createElement('img');
+            image.src = photo.thumbUrl;
+            image.alt = photo.altDescription;
+            image.setAttribute('loading', 'lazy');
+
+            const overlay = document.createElement('div');
+            overlay.className = 'photobrowser-photo-overlay';
+
+            const photographer = document.createElement('span');
+            photographer.className = 'photographer';
+            photographer.textContent = photo.photographerName;
+
+            const importButton = document.createElement('button');
+            importButton.className = 'btn btn-sm btn-primary import-btn';
+            importButton.dataset.photoId = photo.id;
+            importButton.textContent = 'Import';
+            importButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.importPhoto(photo.id);
             });
+
+            overlay.append(photographer, importButton);
+            card.append(image, overlay);
 
             this.resultsContainer.appendChild(card);
         });

@@ -11,6 +11,7 @@ use DkdDobberkau\FalPhotoBrowser\Domain\Dto\UnsplashPhoto;
 final class UnsplashApiService
 {
     private const API_BASE = 'https://api.unsplash.com/';
+    private const ID_PATTERN = '/^[A-Za-z0-9_-]+\z/';
 
     private HttpClientInterface $httpClient;
     private ?string $accessKey;
@@ -18,10 +19,11 @@ final class UnsplashApiService
     public function __construct()
     {
         $this->accessKey = $_ENV['UNSPLASH_ACCESS_KEY'] ?? getenv('UNSPLASH_ACCESS_KEY') ?: null;
-        $this->httpClient = HttpClient::create([
-            'base_uri' => self::API_BASE,
+        // Scoped to the API host, so the key is not sent to any other URL.
+        $this->httpClient = HttpClient::createForBaseUri(self::API_BASE, [
             'headers' => [
                 'Accept-Version' => 'v1',
+                'Authorization' => 'Client-ID ' . $this->accessKey,
             ],
         ]);
     }
@@ -29,6 +31,11 @@ final class UnsplashApiService
     public function isConfigured(): bool
     {
         return $this->accessKey !== null && $this->accessKey !== '';
+    }
+
+    public static function isValidId(string $id): bool
+    {
+        return preg_match(self::ID_PATTERN, $id) === 1;
     }
 
     /**
@@ -45,7 +52,6 @@ final class UnsplashApiService
             'query' => $query,
             'page' => $page,
             'per_page' => $perPage,
-            'client_id' => $this->accessKey,
         ];
 
         if ($orientation !== null) {
@@ -80,7 +86,6 @@ final class UnsplashApiService
             'query' => [
                 'page' => $page,
                 'per_page' => $perPage,
-                'client_id' => $this->accessKey,
             ],
         ]);
 
@@ -99,11 +104,12 @@ final class UnsplashApiService
      */
     public function getCollectionPhotos(string $collectionId, int $page = 1, int $perPage = 30): array
     {
+        $this->assertValidId($collectionId);
+
         $response = $this->httpClient->request('GET', "collections/{$collectionId}/photos", [
             'query' => [
                 'page' => $page,
                 'per_page' => $perPage,
-                'client_id' => $this->accessKey,
             ],
         ]);
 
@@ -115,11 +121,9 @@ final class UnsplashApiService
 
     public function getPhoto(string $photoId): UnsplashPhoto
     {
-        $response = $this->httpClient->request('GET', "photos/{$photoId}", [
-            'query' => [
-                'client_id' => $this->accessKey,
-            ],
-        ]);
+        $this->assertValidId($photoId);
+
+        $response = $this->httpClient->request('GET', "photos/{$photoId}");
 
         return UnsplashPhoto::fromApiResponse($response->toArray());
     }
@@ -129,13 +133,16 @@ final class UnsplashApiService
      */
     public function triggerDownload(string $downloadLocationUrl): string
     {
-        $response = $this->httpClient->request('GET', $downloadLocationUrl, [
-            'query' => [
-                'client_id' => $this->accessKey,
-            ],
-        ]);
+        $response = $this->httpClient->request('GET', $downloadLocationUrl);
 
         $data = $response->toArray();
         return $data['url'];
+    }
+
+    private function assertValidId(string $id): void
+    {
+        if (!self::isValidId($id)) {
+            throw new \InvalidArgumentException('Invalid Unsplash ID', 1793491200);
+        }
     }
 }

@@ -20,6 +20,11 @@ final class FileImportService
 
     public function importPhoto(UnsplashPhoto $photo, int $storageUid = 1, string $targetFolder = 'unsplash'): File
     {
+        $storage = $this->storageRepository->findByUid($storageUid);
+        if ($storage === null) {
+            throw new \InvalidArgumentException('Unknown file storage ' . $storageUid, 1793491201);
+        }
+
         // Trigger download tracking (required by Unsplash guidelines)
         $downloadUrl = $this->unsplashApiService->triggerDownload($photo->downloadUrl);
 
@@ -38,8 +43,7 @@ final class FileImportService
         $imageContent = file_get_contents($downloadUrl);
         file_put_contents($tempFile, $imageContent);
 
-        // Get storage and create folder structure
-        $storage = $this->storageRepository->findByUid($storageUid);
+        // Create folder structure
         $folderPath = dirname($relativePath);
 
         if (!$storage->hasFolder($folderPath)) {

@@ -6,7 +6,9 @@ namespace DkdDobberkau\FalPhotoBrowser\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
+use TYPO3\CMS\Backend\Module\ModuleProvider;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use DkdDobberkau\FalPhotoBrowser\Service\AiChatService;
@@ -16,11 +18,16 @@ use DkdDobberkau\FalPhotoBrowser\Service\UnsplashApiService;
 #[AsController]
 final class PhotoBrowserController
 {
+    private const MODULE_IDENTIFIER = 'falphotobrowser';
+    private const TARGET_FOLDER_PATTERN = '#^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*\z#';
+
     public function __construct(
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly UnsplashApiService $unsplashApiService,
         private readonly FileImportService $fileImportService,
         private readonly AiChatService $aiChatService,
+        private readonly ModuleProvider $moduleProvider,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function indexAction(ServerRequestInterface $request): ResponseInterface
@@ -57,45 +64,51 @@ final class PhotoBrowserController
 
     public function searchAction(ServerRequestInterface $request): ResponseInterface
     {
-        $params = $request->getQueryParams();
+        return $this->handleAjax('Photo search failed.', function () use ($request): ResponseInterface {
+            $params = $request->getQueryParams();
 
-        $query = $params['query'] ?? '';
-        $page = (int)($params['page'] ?? 1);
-        $orientation = $params['orientation'] ?? null;
-        $color = $params['color'] ?? null;
+            $query = $this->stringValue($params, 'query');
+            $page = (int)($params['page'] ?? 1);
 
-        if ($query === '') {
-            return new JsonResponse(['photos' => [], 'total' => 0, 'totalPages' => 0]);
-        }
+            if ($query === '') {
+                return new JsonResponse(['photos' => [], 'total' => 0, 'totalPages' => 0]);
+            }
 
-        $result = $this->unsplashApiService->search(
-            query: $query,
-            page: $page,
-            perPage: 30,
-            orientation: $orientation ?: null,
-            color: $color ?: null,
-        );
+            $result = $this->unsplashApiService->search(
+                query: $query,
+                page: $page,
+                perPage: 30,
+                orientation: $this->stringValue($params, 'orientation') ?: null,
+                color: $this->stringValue($params, 'color') ?: null,
+            );
 
-        return new JsonResponse([
-            'photos' => array_map(fn($photo) => $photo->toArray(), $result['photos']),
-            'total' => $result['total'],
-            'totalPages' => $result['totalPages'],
-            'page' => $page,
-        ]);
+            return new JsonResponse([
+                'photos' => array_map(fn($photo) => $photo->toArray(), $result['photos']),
+                'total' => $result['total'],
+                'totalPages' => $result['totalPages'],
+                'page' => $page,
+            ]);
+        });
     }
 
     public function importAction(ServerRequestInterface $request): ResponseInterface
     {
-        $body = json_decode($request->getBody()->getContents(), true);
-        $photoId = $body['photoId'] ?? '';
-        $storageUid = (int)($body['storageUid'] ?? 1);
-        $targetFolder = $body['targetFolder'] ?? 'unsplash';
+        return $this->handleAjax('The photo could not be imported.', function () use ($request): ResponseInterface {
+            $body = $this->jsonBody($request);
+            $photoId = $this->stringValue($body, 'photoId');
+            $storageUid = (int)($body['storageUid'] ?? 1);
+            $targetFolder = $this->stringValue($body, 'targetFolder', 'unsplash');
 
-        if ($photoId === '') {
-            return new JsonResponse(['success' => false, 'error' => 'No photo ID provided'], 400);
-        }
+            if ($photoId === '') {
+                return new JsonResponse(['success' => false, 'error' => 'No photo ID provided'], 400);
+            }
+            if (!UnsplashApiService::isValidId($photoId)) {
+                return new JsonResponse(['success' => false, 'error' => 'Invalid photo ID'], 400);
+            }
+            if (preg_match(self::TARGET_FOLDER_PATTERN, $targetFolder) !== 1) {
+                return new JsonResponse(['success' => false, 'error' => 'Invalid target folder'], 400);
+            }
 
-        try {
             $photo = $this->unsplashApiService->getPhoto($photoId);
             $file = $this->fileImportService->importPhoto($photo, $storageUid, $targetFolder);
 
@@ -108,29 +121,24 @@ final class PhotoBrowserController
                     'identifier' => $file->getCombinedIdentifier(),
                 ],
             ]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'success' => false,
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        });
     }
 
     public function chatAction(ServerRequestInterface $request): ResponseInterface
     {
-        $body = json_decode($request->getBody()->getContents(), true);
-        $userMessage = $body['message'] ?? '';
-        $conversationHistory = $body['history'] ?? [];
+        return $this->handleAjax('The assistant request failed.', function () use ($request): ResponseInterface {
+            $body = $this->jsonBody($request);
+            $userMessage = $this->stringValue($body, 'message');
+            $conversationHistory = is_array($body['history'] ?? null) ? $body['history'] : [];
 
-        if ($userMessage === '') {
-            return new JsonResponse(['success' => false, 'error' => 'No message provided'], 400);
-        }
+            if ($userMessage === '') {
+                return new JsonResponse(['success' => false, 'error' => 'No message provided'], 400);
+            }
 
-        if (!$this->aiChatService->isConfigured()) {
-            return new JsonResponse(['success' => false, 'error' => 'AI chat not configured. Set up a provider in EXT:aim or set ANTHROPIC_API_KEY.'], 503);
-        }
+            if (!$this->aiChatService->isConfigured()) {
+                return new JsonResponse(['success' => false, 'error' => 'AI chat not configured. Set up a provider in EXT:aim or set ANTHROPIC_API_KEY.'], 503);
+            }
 
-        try {
             $aiResponse = $this->aiChatService->chat($userMessage, $conversationHistory);
 
             $searchResults = null;
@@ -155,21 +163,56 @@ final class PhotoBrowserController
                 'chat' => $aiResponse,
                 'search' => $searchResults,
             ]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'success' => false,
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        });
     }
 
     public function collectionsAction(ServerRequestInterface $request): ResponseInterface
     {
-        $params = $request->getQueryParams();
-        $page = (int)($params['page'] ?? 1);
+        return $this->handleAjax('Loading collections failed.', function () use ($request): ResponseInterface {
+            $params = $request->getQueryParams();
+            $page = (int)($params['page'] ?? 1);
 
-        $collections = $this->unsplashApiService->getCollections($page);
+            $collections = $this->unsplashApiService->getCollections($page);
 
-        return new JsonResponse(['collections' => $collections]);
+            return new JsonResponse(['collections' => $collections]);
+        });
+    }
+
+    /**
+     * AJAX routes only require a backend login, so the module access is enforced here.
+     * Exception messages can carry upstream details and never reach the client.
+     *
+     * @param callable(): ResponseInterface $action
+     */
+    private function handleAjax(string $errorMessage, callable $action): ResponseInterface
+    {
+        if (!$this->moduleProvider->accessGranted(self::MODULE_IDENTIFIER, $GLOBALS['BE_USER'])) {
+            return new JsonResponse(['success' => false, 'error' => 'Access denied'], 403);
+        }
+
+        try {
+            return $action();
+        } catch (\Throwable $e) {
+            $this->logger->error($errorMessage, ['exception' => $e]);
+            return new JsonResponse(['success' => false, 'error' => $errorMessage], 500);
+        }
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function jsonBody(ServerRequestInterface $request): array
+    {
+        $body = json_decode($request->getBody()->getContents(), true);
+        return is_array($body) ? $body : [];
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function stringValue(array $data, string $key, string $default = ''): string
+    {
+        $value = $data[$key] ?? $default;
+        return is_string($value) ? $value : '';
     }
 }

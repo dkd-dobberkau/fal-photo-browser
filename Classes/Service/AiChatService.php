@@ -6,6 +6,10 @@ namespace DkdDobberkau\FalPhotoBrowser\Service;
 
 final class AiChatService
 {
+    private const MAX_MESSAGE_LENGTH = 2000;
+    private const MAX_HISTORY_ENTRIES = 20;
+    private const HISTORY_ROLES = ['user', 'assistant'];
+
     private const SYSTEM_PROMPT = <<<'PROMPT'
 You are a photo search assistant integrated into a TYPO3 backend module that searches Unsplash.
 Your job is to help users find the right stock photos based on their descriptions.
@@ -48,23 +52,29 @@ PROMPT;
     }
 
     /**
-     * @param array<int, array{role: string, content: string}> $conversationHistory
+     * @param array<mixed> $conversationHistory Client supplied, so entries are checked and limited here
      * @return array{message: string, searchTerms: string, alternativeTerms: string[], orientation: ?string, color: ?string, suggestions: string[]}
      */
     public function chat(string $userMessage, array $conversationHistory = []): array
     {
         $messages = [];
 
-        foreach ($conversationHistory as $entry) {
+        foreach (array_slice($conversationHistory, -self::MAX_HISTORY_ENTRIES) as $entry) {
+            if (!is_array($entry)
+                || !in_array($entry['role'] ?? null, self::HISTORY_ROLES, true)
+                || !is_string($entry['content'] ?? null)
+            ) {
+                continue;
+            }
             $messages[] = [
                 'role' => $entry['role'],
-                'content' => $entry['content'],
+                'content' => mb_substr($entry['content'], 0, self::MAX_MESSAGE_LENGTH),
             ];
         }
 
         $messages[] = [
             'role' => 'user',
-            'content' => $userMessage,
+            'content' => mb_substr($userMessage, 0, self::MAX_MESSAGE_LENGTH),
         ];
 
         $content = $this->client()->complete(self::SYSTEM_PROMPT, $messages);
