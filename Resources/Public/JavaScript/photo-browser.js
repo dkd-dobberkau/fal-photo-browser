@@ -5,6 +5,9 @@ class PhotoBrowser {
         this.currentQuery = '';
         this.chatHistory = [];
         this.chatOpen = false;
+        this.searchTimeout = null;
+        this.searchController = null;
+        this.lastSearchKey = null;
         this.init();
     }
 
@@ -17,6 +20,7 @@ class PhotoBrowser {
         this.loadMoreBtn = document.getElementById('photobrowser-load-more');
         this.paginationContainer = document.getElementById('photobrowser-pagination');
         this.loadingIndicator = document.getElementById('photobrowser-loading');
+        this.emptyMessage = document.getElementById('photobrowser-empty');
 
         if (!this.queryInput) return;
 
@@ -29,10 +33,9 @@ class PhotoBrowser {
         this.loadMoreBtn.addEventListener('click', () => this.loadMore());
 
         // Debounced search
-        let timeout;
         this.queryInput.addEventListener('input', () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => this.search(), 500);
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => this.search(), 800);
         });
 
         this.initChat();
@@ -122,10 +125,13 @@ class PhotoBrowser {
 
             // Render search results
             if (data.search && data.search.photos) {
+                this.cancelPendingSearch();
+                this.lastSearchKey = null;
                 this.currentPage = 1;
                 this.totalPages = data.search.totalPages;
                 this.resultsContainer.innerHTML = '';
                 this.renderPhotos(data.search.photos);
+                this.emptyMessage.style.display = data.search.photos.length === 0 ? 'block' : 'none';
 
                 if (this.currentPage < this.totalPages) {
                     this.paginationContainer.style.display = 'block';
@@ -202,13 +208,28 @@ class PhotoBrowser {
         }
     }
 
+    cancelPendingSearch() {
+        clearTimeout(this.searchTimeout);
+        if (this.searchController) {
+            this.searchController.abort();
+        }
+    }
+
     async search() {
+        clearTimeout(this.searchTimeout);
+
         const query = this.queryInput.value.trim();
         if (!query) return;
+
+        // Enter after the debounced search must not spend quota on the same request
+        const searchKey = [query, this.orientationSelect.value, this.colorSelect.value].join('|');
+        if (searchKey === this.lastSearchKey) return;
+        this.lastSearchKey = searchKey;
 
         this.currentQuery = query;
         this.currentPage = 1;
         this.resultsContainer.innerHTML = '';
+        this.emptyMessage.style.display = 'none';
         await this.fetchPhotos();
     }
 
@@ -218,6 +239,10 @@ class PhotoBrowser {
     }
 
     async fetchPhotos(append = false) {
+        this.cancelPendingSearch();
+        const controller = new AbortController();
+        this.searchController = controller;
+
         this.loadingIndicator.style.display = 'block';
         this.paginationContainer.style.display = 'none';
 
@@ -229,7 +254,9 @@ class PhotoBrowser {
         });
 
         try {
-            const response = await fetch(TYPO3.settings.ajaxUrls.falphotobrowser_search + '&' + params);
+            const response = await fetch(TYPO3.settings.ajaxUrls.falphotobrowser_search + '&' + params, {
+                signal: controller.signal,
+            });
             if (!response.ok) {
                 throw new Error('Search request failed with status ' + response.status);
             }
@@ -243,14 +270,23 @@ class PhotoBrowser {
 
             this.renderPhotos(data.photos);
 
+            if (!append) {
+                this.emptyMessage.style.display = data.photos.length === 0 ? 'block' : 'none';
+            }
+
             if (this.currentPage < this.totalPages) {
                 this.paginationContainer.style.display = 'block';
             }
         } catch (error) {
+            if (error.name === 'AbortError') return;
+
+            this.lastSearchKey = null;
             console.error('Search failed:', error);
             top.TYPO3.Notification.error('Error', 'Failed to search photos');
         } finally {
-            this.loadingIndicator.style.display = 'none';
+            if (this.searchController === controller) {
+                this.loadingIndicator.style.display = 'none';
+            }
         }
     }
 

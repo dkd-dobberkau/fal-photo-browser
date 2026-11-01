@@ -57,6 +57,11 @@
                     <div class="photobrowser-content">
                         <div id="photobrowser-results" class="photobrowser-results"></div>
 
+                        <p id="photobrowser-empty" class="text-muted" style="display: none;">
+                            No photos found. Unsplash works best with English search terms.
+                            <f:if condition="{isChatConfigured}">The Photo Assistant can translate your description.</f:if>
+                        </p>
+
                         <div id="photobrowser-pagination" class="photobrowser-pagination mt-4" style="display: none;">
                             <button class="btn btn-default" id="photobrowser-load-more">
                                 Load more
